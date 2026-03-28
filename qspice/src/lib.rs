@@ -9,3 +9,8 @@ mod util;
 pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
     macros::main(args.into(), item.into()).into()
 }
+
+#[proc_macro_attribute]
+pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
+    macros::max(args.into(), item.into()).into()
+}

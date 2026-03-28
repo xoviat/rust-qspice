@@ -8,3 +8,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 libc = "0.2.183"
+qspice = { version = "0.1.0", path = "../qspice" }

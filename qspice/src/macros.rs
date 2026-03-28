@@ -1,6 +1,5 @@
-
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
+use quote::{ToTokens, format_ident, quote};
 use syn::{FnArg, ReturnType, Type};
 
 use crate::util::{
@@ -100,10 +99,9 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             let dec = format_ident!("_{}", i);
-            let off = format_ident!("{}", i);
             let u = arg.typ.u();
             let ty = arg.typ.ty();
-            quote! { let #dec: #pfx #ty = #pfx (*data.add(#off)).#u; }
+            quote! { let #dec: #pfx #ty = #pfx (*data.add(#i)).#u; }
         })
         .collect();
 
@@ -155,5 +153,130 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
                 let _ = Box::from_raw(opaque as *mut #st);
             }
         }
+
+        #errors
     }
+}
+
+pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
+    let mut errors = TokenStream::new();
+
+    // If any of the steps for this macro fail, we still want to expand to an item that is as close
+    // to the expected output as possible. This helps out IDEs such that completions and other
+    // related features keep working.
+    let f: ItemFn = match syn::parse2(item.clone()) {
+        Ok(x) => x,
+        Err(e) => return token_stream_with_error(item, e),
+    };
+
+    // This function has no arguments
+    let returns_impl_trait = match &f.sig.output {
+        ReturnType::Type(_, ty) => matches!(**ty, Type::ImplTrait(_)),
+        _ => false,
+    };
+
+    if f.sig.asyncness.is_some() || returns_impl_trait {
+        error(
+            &mut errors,
+            &f.sig,
+            "function must not be async or impl trait",
+        );
+    }
+    if !f.sig.generics.params.is_empty() {
+        error(&mut errors, &f.sig, "function must not be generic");
+    }
+    if !f.sig.generics.where_clause.is_none() {
+        error(
+            &mut errors,
+            &f.sig,
+            "function must not have `where` clauses",
+        );
+    }
+    if !f.sig.abi.is_none() {
+        error(
+            &mut errors,
+            &f.sig,
+            "function must not have an ABI qualifier",
+        );
+    }
+    if !f.sig.variadic.is_none() {
+        error(&mut errors, &f.sig, "function must not be variadic");
+    }
+
+    if let ReturnType::Type(_, ty) = &f.sig.output
+        && **ty == parse_type! { f64 }
+    {
+        // return type valid
+    } else {
+        error(&mut errors, &f.sig, "function has incorrect return type");
+    }
+
+    let fargs = f.sig.inputs.clone();
+    let st = if fargs.len() == 2 {
+        let (arg_st, arg_t) = (&fargs[0], &fargs[1]);
+
+        if let FnArg::Typed(arg_t) = arg_t
+            && *arg_t.ty == parse_type! { f64 }
+        {
+            // argument valid
+        } else {
+            error(&mut errors, &arg_t, "argument type is not correct");
+        };
+
+        process_st_arg(arg_st)
+            .map_err(|e| error(&mut errors, &arg_st, e))
+            .unwrap_or(TokenStream::new())
+    } else {
+        error(&mut errors, &args, "incorrect number of arguments");
+
+        TokenStream::new()
+    };
+
+    let f_body = f.body;
+
+    quote! {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn MaxExtStepSize(opaque: *mut u8, t: f64) -> f64 {
+            fn fun(#fargs) -> f64 {
+                #f_body
+            }
+
+            unsafe {
+                fun(&mut *(opaque as *mut #st), t)
+            }
+        }
+
+        #errors
+    }
+}
+
+#[test]
+fn test_main() {
+    main(
+        quote! {},
+        quote! {
+            fn cont(
+                cont: &mut sCONT,
+                t: f64,
+                data: (
+                    f32,
+                    f32,
+                    f32,
+                    f32,
+                    f32,
+                    &mut bool,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                    &mut f32,
+                ),
+            ) {
+            }
+        },
+    );
 }
