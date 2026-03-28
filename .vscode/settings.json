@@ -1,0 +1,6 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "cont/Cargo.toml",
+        "qspice/Cargo.toml",
+    ]
+}
