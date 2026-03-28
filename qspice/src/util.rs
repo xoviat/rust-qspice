@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use proc_macro2::{TokenStream, TokenTree};
-use quote::{ToTokens, TokenStreamExt, quote};
+use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::{
     AttrStyle, Attribute, FnArg, Signature, Token, Type, Visibility, braced, bracketed, token,
@@ -228,4 +228,33 @@ pub(crate) fn process_data_arg(arg_data: &FnArg) -> Result<Vec<Argument>, &'stat
         .map(|t| t.clone().try_into())
         .collect::<Result<Vec<Argument>, _>>()
         .map_err(|_| "failed to parse tuple arguments")
+}
+
+pub(crate) fn process_data_vars(args: &Vec<Argument>) -> (TokenStream, TokenStream) {
+    let vars: TokenStream = args
+        .iter()
+        .enumerate()
+        .map(|(i, arg)| {
+            let pfx = match arg.dir {
+                ArgDir::Input => TokenStream::new(),
+                ArgDir::Output => {
+                    quote! { &mut }
+                }
+            };
+
+            let dec = format_ident!("_{}", i);
+            let u = arg.typ.u();
+            let ty = arg.typ.ty();
+            quote! { let #dec: #pfx #ty = #pfx (*data.add(#i)).#u; }
+        })
+        .collect();
+
+    let tup: TokenStream = (0..args.len())
+        .map(|i| {
+            let dec = format_ident!("_{}", i);
+            quote! { #dec, }
+        })
+        .collect();
+
+    (vars, tup)
 }

@@ -76,38 +76,8 @@ fn max_ext_step_size(inst: &mut sCONT, t: f64) -> f64 {
     1e308 // implement a good choice of max timestep size that depends on struct sCONT
 }
 
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn Trunc(inst: *mut sCONT, t: f64, data: *mut __u_data, timestep: *mut f64) {
-    unsafe {
-        let vbulk: f32 = (*data.add(0)).f; // input
-        let v_ab: f32 = (*data.add(1)).f; // input
-        let v_bc: f32 = (*data.add(2)).f; // input
-        let i_1: f32 = (*data.add(3)).f; // input
-        let i_2: f32 = (*data.add(4)).f; // input
-
-        let en: &mut bool = &mut (*data.add(5)).b; // output
-        let a1: &mut f32 = &mut (*data.add(6)).f; // output
-        let a3: &mut f32 = &mut (*data.add(7)).f; // output
-        let a5: &mut f32 = &mut (*data.add(8)).f; // output
-        let vd: &mut f32 = &mut (*data.add(9)).f; // output
-        let vq: &mut f32 = &mut (*data.add(10)).f; // output
-        let vd_ref: &mut f32 = &mut (*data.add(11)).f; // output
-        let vq_ref: &mut f32 = &mut (*data.add(12)).f; // output
-        let va_ref: &mut f32 = &mut (*data.add(13)).f; // output
-        let vb_ref: &mut f32 = &mut (*data.add(14)).f; // output
-
-        trunc_inner(
-            &mut *inst,
-            t,
-            (
-                vbulk, v_ab, v_bc, i_1, i_2, en, a1, a3, a5, vd, vq, vd_ref, vq_ref, va_ref, vb_ref,
-            ),
-            &mut *timestep,
-        );
-    }
-}
-
-fn trunc_inner(
+#[qspice::trunc]
+fn trunc(
     cont: &mut sCONT,
     t: f64,
     data: (
