@@ -1,13 +1,7 @@
-use std::str::FromStr;
 
-use darling::FromMeta;
-use darling::export::NestedMeta;
-use proc_macro2::{Span, TokenStream};
-use quote::{ToTokens, format_ident, quote};
-use syn::punctuated::Punctuated;
-use syn::token::{Comma, Fn};
-use syn::visit::{self, Visit};
-use syn::{Expr, ExprLit, FnArg, Lit, LitInt, ReturnType, Type, Visibility};
+use proc_macro2::TokenStream;
+use quote::{format_ident, quote};
+use syn::{FnArg, ReturnType, Type};
 
 use crate::util::{
     ArgDir, ItemFn, error, process_data_arg, process_st_arg, token_stream_with_error,
