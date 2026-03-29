@@ -87,6 +87,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
     let f_body = f.body;
     let f_name = f.sig.ident;
     let f_export = f_name.to_string();
+    let f_vis = f.vis;
 
     let (vars, tup) = process_data_vars(&args);
 
@@ -114,7 +115,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
         fn __qspice_main(_st: &mut #st) {}
 
         #[inline]
-        fn #f_name(#fargs) {
+        #f_vis fn #f_name(#fargs) {
             #f_body
         }
 
@@ -225,12 +226,13 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let f_body = f.body;
     let f_name = f.sig.ident;
+    let f_vis = f.vis;
 
     let (vars, tup) = process_data_vars(&args);
 
     quote! {
         #[inline]
-        fn #f_name(#fargs) {
+        #f_vis fn #f_name(#fargs) {
             #f_body
         }
 
@@ -326,10 +328,11 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let f_body = f.body;
     let f_name = f.sig.ident;
+    let f_vis = f.vis;
 
     quote! {
         #[inline]
-        fn #f_name(#fargs) -> f64 {
+        #f_vis fn #f_name(#fargs) -> f64 {
             #f_body
         }
 
