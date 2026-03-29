@@ -86,6 +86,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let f_body = f.body;
     let f_name = f.sig.ident;
+    let f_export = f_name.to_string();
 
     let (vars, tup) = process_data_vars(&args);
 
@@ -112,13 +113,13 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
         #[inline]
         fn __qspice_main(_st: &mut #st) {}
 
-        #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn #f_name(opaque: *mut *mut u8, t: f64, data: *mut __u_data) {
-            #[inline]
-            fn fun(#fargs) {
-                #f_body
-            }
+        #[inline]
+        fn #f_name(#fargs) {
+            #f_body
+        }
 
+        #[unsafe(export_name = #f_export)]
+        pub unsafe extern "C" fn __qspice_main_fun(opaque: *mut *mut u8, t: f64, data: *mut __u_data) {
             unsafe {
                 #vars
 
@@ -128,7 +129,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
 
                 let mut qspice = ::qspice::QSpice::new();
 
-                fun(&mut qspice, &mut *(*opaque as *mut #st), t, (#tup));
+                #f_name(&mut qspice, &mut *(*opaque as *mut #st), t, (#tup));
             }
         }
 
@@ -223,24 +224,25 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     let f_body = f.body;
+    let f_name = f.sig.ident;
 
     let (vars, tup) = process_data_vars(&args);
 
     quote! {
-        #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn Trunc(opaque: *mut u8, t: f64, data: *mut __u_data, timestep: *mut f64) {
-            #[inline]
-            fn fun(#fargs) {
-                #f_body
-            }
+        #[inline]
+        fn #f_name(#fargs) {
+            #f_body
+        }
 
+        #[unsafe(export_name = "Trunc")]
+        pub unsafe extern "C" fn __qspice_trunc_fun(opaque: *mut u8, t: f64, data: *mut __u_data, timestep: *mut f64) {
             unsafe {
                 #vars
 
                 let mut qspice = ::qspice::QSpice::new();
 
                 __qspice_main(&mut *(opaque as *mut #st));
-                fun(&mut qspice, &mut *(opaque as *mut #st), t, (#tup), &mut *timestep);
+                #f_name(&mut qspice, &mut *(opaque as *mut #st), t, (#tup), &mut *timestep);
             }
         }
 
@@ -323,20 +325,21 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     let f_body = f.body;
+    let f_name = f.sig.ident;
 
     quote! {
-        #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn MaxExtStepSize(opaque: *mut u8, t: f64) -> f64 {
-            #[inline]
-            fn fun(#fargs) -> f64 {
-                #f_body
-            }
+        #[inline]
+        fn #f_name(#fargs) -> f64 {
+            #f_body
+        }
 
+        #[unsafe(export_name = "MaxExtStepSize")]
+        pub unsafe extern "C" fn __qspice_max_fun(opaque: *mut u8, t: f64) -> f64 {
             unsafe {
                 let mut qspice = ::qspice::QSpice::new();
 
                 __qspice_main(&mut *(opaque as *mut #st));
-                fun(&mut qspice, &mut *(opaque as *mut #st), t)
+                #f_name(&mut qspice, &mut *(opaque as *mut #st), t)
             }
         }
 
