@@ -107,6 +107,11 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
             pub bytes: *mut u8,
         }
 
+        // TODO: validate args tuple as well
+        /// main type validator
+        #[inline]
+        fn __qspice_main(_st: &mut #st) {}
+
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn #f_name(opaque: *mut *mut u8, t: f64, data: *mut __u_data) {
             #[inline]
@@ -230,6 +235,7 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
             unsafe {
                 #vars
 
+                __qspice_main(&mut *(opaque as *mut #st));
                 fun(&mut *(opaque as *mut #st), t, (#tup), &mut *timestep);
             }
         }
@@ -323,6 +329,7 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
             }
 
             unsafe {
+                __qspice_main(&mut *(opaque as *mut #st));
                 fun(&mut *(opaque as *mut #st), t)
             }
         }

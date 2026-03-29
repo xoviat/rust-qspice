@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "qspice"
+name = "qspice-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
