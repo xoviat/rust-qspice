@@ -134,8 +134,8 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn Destroy(opaque: *mut u8) {
+        #[unsafe(export_name = "Destroy")]
+        pub unsafe extern "C" fn __qspice_destroy_fun(opaque: *mut u8) {
             unsafe {
                 let _ = Box::from_raw(opaque as *mut #st);
             }
