@@ -1,5 +1,6 @@
-use qspice::Console;
 use std::io::Write;
+
+use qspice::QSpice;
 
 #[derive(Default)]
 pub struct Cont {
@@ -8,6 +9,7 @@ pub struct Cont {
 
 #[qspice::main]
 fn cont(
+    qspice: &mut QSpice,
     cont: &mut Cont,
     _t: f64,
     _data: (
@@ -27,22 +29,21 @@ fn cont(
         &mut f32,
     ),
 ) {
-    let mut console = Console::new();
-
     cont.count += 1;
 
     if cont.count < 3 {
-        let _ = writeln!(&mut console, "test message");
+        let _ = writeln!(qspice, "test message");
     }
 }
 
 #[qspice::max]
-fn max_ext_step_size(_inst: &mut Cont, _t: f64) -> f64 {
+fn max_ext_step_size(_qspice: &mut QSpice, _inst: &mut Cont, _t: f64) -> f64 {
     1e308 // implement a good choice of max timestep size that depends on struct sCONT
 }
 
 #[qspice::trunc]
 fn trunc(
+    _qspice: &mut QSpice,
     _cont: &mut Cont,
     _t: f64,
     _data: (

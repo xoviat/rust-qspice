@@ -1,6 +1,6 @@
 [package]
 name = "qspice-macros"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Build DLLs to simulate digital functionality for qspice using rust"
 license = "MIT"
@@ -8,7 +8,7 @@ readme = "../README.md"
 repository = "https://github.com/xoviat/rust-qspice"
 
 [dependencies]
-syn = { version = "2.0", features = ["full", "visit"] }
+syn = { version = "2.0", features = ["full"] }
 quote = "1.0"
 proc-macro2 = "1.0.106"
 darling = "0.23.0"

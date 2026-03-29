@@ -37,23 +37,25 @@ mod ffi {
     pub static mut InstallDirectory: *const c_char = ptr::null();
 }
 
-pub fn temperature() -> f64 {
-    unsafe { *ffi::DegreesC }
+pub struct QSpice {
+    _private: (),
 }
 
-pub fn step_number() -> i32 {
-    unsafe { *ffi::StepNumber }
-}
+impl QSpice {
+    pub const unsafe fn new() -> Self {
+        Self { _private: () }
+    }
 
-pub struct Console {}
+    pub fn temperature(&self) -> f64 {
+        unsafe { *ffi::DegreesC }
+    }
 
-impl Console {
-    pub const fn new() -> Self {
-        Self {}
+    pub fn step_number(&self) -> i32 {
+        unsafe { *ffi::StepNumber }
     }
 }
 
-impl Write for Console {
+impl Write for QSpice {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         // This way ensures that format specifiers in the string are ignored
         let sp = CString::new("%s")?;

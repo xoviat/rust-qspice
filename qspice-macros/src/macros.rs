@@ -59,8 +59,8 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let fargs = f.sig.inputs.clone();
-    let (st, args) = if fargs.len() == 3 {
-        let (arg_st, arg_t, arg_data) = (&fargs[0], &fargs[1], &fargs[2]);
+    let (st, args) = if fargs.len() == 4 {
+        let (arg_st, arg_t, arg_data) = (&fargs[1], &fargs[2], &fargs[3]);
 
         if let FnArg::Typed(arg_t) = arg_t
             && *arg_t.ty == parse_type! { f64 }
@@ -126,7 +126,9 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
                     *opaque = Box::into_raw(Box::from(#st::default())) as *mut u8;
                 }
 
-                fun(&mut *(*opaque as *mut #st), t, (#tup));
+                let mut qspice = ::qspice::QSpice::new();
+
+                fun(&mut qspice, &mut *(*opaque as *mut #st), t, (#tup));
             }
         }
 
@@ -187,8 +189,8 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let fargs = f.sig.inputs.clone();
-    let (st, args) = if fargs.len() == 4 {
-        let (arg_st, arg_t, arg_data, arg_tstep) = (&fargs[0], &fargs[1], &fargs[2], &fargs[3]);
+    let (st, args) = if fargs.len() == 5 {
+        let (arg_st, arg_t, arg_data, arg_tstep) = (&fargs[1], &fargs[2], &fargs[3], &fargs[4]);
 
         if let FnArg::Typed(arg_t) = arg_t
             && *arg_t.ty == parse_type! { f64 }
@@ -235,8 +237,10 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
             unsafe {
                 #vars
 
+                let mut qspice = ::qspice::QSpice::new();
+
                 __qspice_main(&mut *(opaque as *mut #st));
-                fun(&mut *(opaque as *mut #st), t, (#tup), &mut *timestep);
+                fun(&mut qspice, &mut *(opaque as *mut #st), t, (#tup), &mut *timestep);
             }
         }
 
@@ -298,8 +302,8 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let fargs = f.sig.inputs.clone();
-    let st = if fargs.len() == 2 {
-        let (arg_st, arg_t) = (&fargs[0], &fargs[1]);
+    let st = if fargs.len() == 3 {
+        let (arg_st, arg_t) = (&fargs[1], &fargs[2]);
 
         if let FnArg::Typed(arg_t) = arg_t
             && *arg_t.ty == parse_type! { f64 }
@@ -329,8 +333,10 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
             }
 
             unsafe {
+                let mut qspice = ::qspice::QSpice::new();
+
                 __qspice_main(&mut *(opaque as *mut #st));
-                fun(&mut *(opaque as *mut #st), t)
+                fun(&mut qspice, &mut *(opaque as *mut #st), t)
             }
         }
 
