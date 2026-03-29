@@ -31,6 +31,8 @@ fn cont(
 ) {
     cont.count += 1;
 
+    let _temp = qspice.temperature();
+
     if cont.count < 3 {
         let _ = writeln!(qspice, "test message");
     }
