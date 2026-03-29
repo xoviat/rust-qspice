@@ -2,6 +2,10 @@
 name = "qspice"
 version = "0.1.0"
 edition = "2024"
+description = "Build DLLs to simulate digital functionality for qspice using rust"
+license = "MIT"
+readme = "../README.md"
+repository = "https://github.com/xoviat/rust-qspice"
 
 [dependencies]
 qspice-macros = { version = "0.1.0", path = "../qspice-macros" }
