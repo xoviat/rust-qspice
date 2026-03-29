@@ -1,7 +1,8 @@
 pub use qspice_macros::{main, max, trunc};
 
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::io::Write;
+use std::str::Utf8Error;
 
 mod ffi {
     use core::ffi::{c_char, c_void};
@@ -46,12 +47,39 @@ impl QSpice {
         Self { _private: () }
     }
 
+    /// current circuit temperature
     pub fn temperature(&self) -> f64 {
         unsafe { *ffi::DegreesC }
     }
 
+    /// current step number
     pub fn step_number(&self) -> i32 {
         unsafe { *ffi::StepNumber }
+    }
+
+    /// estimated number of steps
+    pub fn number_steps(&self) -> i32 {
+        unsafe { *ffi::NumberSteps }
+    }
+
+    /// instance name
+    pub fn instance_name(&self) -> Result<String, Utf8Error> {
+        unsafe { Ok(CStr::from_ptr(*ffi::InstanceName).to_str()?.to_string()) }
+    }
+
+    /// path to QUX.exe
+    pub fn qux_path(&self) -> Result<String, Utf8Error> {
+        unsafe { Ok(CStr::from_ptr(ffi::QUX).to_str()?.to_string()) }
+    }
+
+    /// whether being evaluated non-hypothetically
+    pub fn for_keeps(&self) -> bool {
+        unsafe { *ffi::ForKeeps }
+    }
+
+    /// whether instance initial conditions are being held
+    pub fn hold_ics(&self) -> bool {
+        unsafe { *ffi::HoldICs }
     }
 }
 
