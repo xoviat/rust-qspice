@@ -25,7 +25,6 @@ fn cont(
         &mut f32,
         &mut f32,
         &mut f32,
-        &mut f32,
     ),
 ) {
     let mut console = Console::new();
@@ -53,7 +52,6 @@ fn trunc(
         f32,
         f32,
         &mut bool,
-        &mut f32,
         &mut f32,
         &mut f32,
         &mut f32,
