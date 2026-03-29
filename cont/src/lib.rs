@@ -1,11 +1,14 @@
+use qspice::Console;
+use std::io::Write;
+
 #[derive(Default)]
 pub struct Cont {
-    // declare the structure here
+    count: i64,
 }
 
 #[qspice::main]
 fn cont(
-    _cont: &mut Cont,
+    cont: &mut Cont,
     _t: f64,
     _data: (
         f32,
@@ -25,6 +28,13 @@ fn cont(
         &mut f32,
     ),
 ) {
+    let mut console = Console::new();
+
+    cont.count += 1;
+
+    if cont.count < 3 {
+        let _ = writeln!(&mut console, "test message");
+    }
 }
 
 #[qspice::max]

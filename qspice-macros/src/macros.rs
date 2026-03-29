@@ -109,6 +109,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
 
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn #f_name(opaque: *mut *mut u8, t: f64, data: *mut __u_data) {
+            #[inline]
             fn fun(#fargs) {
                 #f_body
             }
@@ -221,6 +222,7 @@ pub fn trunc(args: TokenStream, item: TokenStream) -> TokenStream {
     quote! {
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn Trunc(opaque: *mut u8, t: f64, data: *mut __u_data, timestep: *mut f64) {
+            #[inline]
             fn fun(#fargs) {
                 #f_body
             }
@@ -315,6 +317,7 @@ pub fn max(args: TokenStream, item: TokenStream) -> TokenStream {
     quote! {
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn MaxExtStepSize(opaque: *mut u8, t: f64) -> f64 {
+            #[inline]
             fn fun(#fargs) -> f64 {
                 #f_body
             }
