@@ -69,6 +69,13 @@ dependencies = [
 name = "qspice"
 version = "0.1.0"
 dependencies = [
+ "qspice-macros",
+]
+
+[[package]]
+name = "qspice-macros"
+version = "0.1.0"
+dependencies = [
  "darling",
  "proc-macro2",
  "quote",

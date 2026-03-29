@@ -103,7 +103,7 @@ pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
             pub d: f64,
             pub i64: i64,
             pub ui64: u64,
-            pub str: *mut c_char,
+            pub str: *mut ::core::ffi::c_char,
             pub bytes: *mut u8,
         }
 
