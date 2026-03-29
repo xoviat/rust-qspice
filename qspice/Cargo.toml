@@ -8,4 +8,4 @@ readme = "../README.md"
 repository = "https://github.com/xoviat/rust-qspice"
 
 [dependencies]
-qspice-macros = { version = "0.1.0", path = "../qspice-macros" }
+qspice-macros = { version = "0.1.1", path = "../qspice-macros" }
